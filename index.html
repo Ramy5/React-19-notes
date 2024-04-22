@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React 19 Note</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <h1>React 19 Note</h1>
+
+    <h3>1. React Compiler</h3>
+    <p>
+      React team has created the "React compiler". The React compiler will now
+      manage re-renders automatically. React will decide how and when to change
+      the state and update the UI.
+      <br />
+      <strong
+        >With this, developers no longer need to handle this manually. It also
+        eliminates the need for useMemo(), useCallback(), and memo.</strong
+      >
+    </p>
+
+    <h3>2. Server Side Components</h3>
+    <p>
+      React is introducing the concept of running components on the server side.
+      <br />
+      <strong
+        >All components in React are client-side by default. Server-side
+        components are enabled using 'use server'.</strong
+      >
+    </p>
+
+    <h3>3. onSubmit Event with Actions</h3>
+    <p>
+      You'll be able to replace the onSubmit event with Actions. These actions
+      are HTML form attributes.
+      <br />
+      <strong
+        >Actions enable both synchronous and asynchronous operations,
+        streamlining data submission management and state updates. The goal is
+        to make working with forms and handling data easier.</strong
+      >
+    </p>
+    <pre><code>&lt;form action={submitData}&gt;
+    &lt;div&gt;
+        &lt;label&gt;Name&lt;/label&gt;
+        &lt;input type="text" name='username'/&gt;
+    &lt;/div&gt;
+    &lt;div&gt;
+        &lt;label&gt;Name&lt;/label&gt;
+        &lt;input type="text" name="email" /&gt;
+    &lt;/div&gt;
+    &lt;button type='submit'&gt;Submit&lt;/button&gt;
+&lt;/form&gt;
+
+</code></pre>
+
+    <h3>4. Title and Meta Tags</h3>
+    <p>
+      With React 19, we can use the title and meta tags directly in our React
+      components.
+    </p>
+    <pre><code>&lt;title&gt;Freecodecamp&lt;/title&gt;
+&lt;meta name="description" content="Freecode camp blogs" /&gt;
+// Page content
+
+</code></pre>
+
+    <h3>5. Removal of useMemo() Hook</h3>
+    <p>
+      After React 19, useMemo() hook is no longer necessary as React Compiler
+      will handle memoization automatically.
+    </p>
+    <pre><code>// BEFORE REACT 19
+const isInputEmpty = useMemo(() => {
+  console.log('Checking if input is empty...');
+  return inputValue.trim() === '';
+}, [inputValue]);
+
+// AFTER REACT 19
+const isInputEmpty = () => {
+  console.log('Checking if input is empty...');
+  return inputValue.trim() === '';
+});
+</code></pre>
+
+    <h3>6. Ref Passed as Props</h3>
+    <p>
+      Ref will now be passed as props instead of using the forwardRef() hook,
+      simplifying the code.
+      <br />
+      <strong>No more need for forwardRef() after React 19.</strong>
+    </p>
+    <pre><code>// BEFORE REACT 19
+const ExampleButton = forwardRef((props, ref) => (
+  &lt;button ref={ref}&gt;
+    {props.children}
+  &lt;/button&gt;
+));
+
+AFTER REACT 19
+ref can be passed as a prop. No more forwardRef() is required.
+const ExampleButton = ({ ref, children }) => (
+  &lt;button ref={ref}&gt;
+    {children}
+  &lt;/button&gt;
+);
+</code></pre>
+
+    <h3>7. New Hook: use()</h3>
+    <p>
+      React 19 introduces a new hook called use() to simplify handling promises,
+      async code, and context.
+    </p>
+    <pre><code>import { use } from "react";
+
+const fetchUsers = async () => {
+    const res = await fetch('https://jsonplaceholder.typicode.com/users');
+    return res.json();
+  };
+  
+const UsersItems = () => {
+    const users = use(fetchUsers());
+  
+    return (
+      &lt;ul&gt;
+        {users.map((user) => (
+          &lt;div key={user.id} className='bg-blue-50 shadow-md p-4 my-6 rounded-lg'&gt;
+            &lt;h2 className='text-xl font-bold'&gt;{user.name}&lt;/h2&gt;
+            &lt;p&gt;{user.email}&lt;/p&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/ul&gt;
+    );
+};
+
+export default UsersItems;
+</code></pre>
+
+    <h3>8. Replacement of useContext()</h3>
+    <p>Now, instead of useContext(), we will have use(context).</p>
+    <pre><code>&lt;script type="module"&gt;
+import { createContext, useState, use } from 'react';
+
+const ThemeContext = createContext();
+
+const ThemeProvider = ({ children }) => {
+  const [theme, setTheme] = useState('light');
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
+
+  return (
+    &lt;ThemeContext.Provider value={{ theme, toggleTheme }}&gt;
+      {children}
+    &lt;/ThemeContext.Provider&gt;
+  );
+};
+
+const Card = () => {
+  // use Hook()
+  const { theme, toggleTheme } = use(ThemeContext);
+
+  return (
+    &lt;div
+      className={`p-4 rounded-md ${
+        theme === 'light' ? 'bg-white' : 'bg-gray-800'
+      }`}
+    &gt;
+      &lt;h1
+        className={`my-4 text-xl ${
+          theme === 'light' ? 'text-gray-800' : 'text-white'
+        }`}
+      &gt;
+        Theme Card
+      &lt;/h1&gt;
+      &lt;p className={theme === 'light' ? 'text-gray-800' : 'text-white'}&gt;
+       Hello!! use() hook
+      &lt;/p&gt;
+      &lt;button
+        onClick={toggleTheme}
+        className='bg-blue-500 hover:bg-blue-600 text-white rounded-md mt-4 p-4'
+      &gt;
+        {theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+};
+
+const Theme = () => {
+  return (
+    &lt;ThemeProvider&gt;
+      &lt;Card /&gt;
+    &lt;/ThemeProvider&gt;
+  );
+};
+
+export default Theme
+&lt;/script&gt;
+</code></pre>
+
+    <h3>9. useFormStatus() hook</h3>
+    <p>
+      useFormStatus() is a new hook in React19 that provides more control over
+      the forms you create. It gives status information about the last form
+      submission.
+    </p>
+    <pre><code>&lt;script type="module"&gt;
+// Here's the syntax:
+// const { pending, data, method, action } = useFormStatus();
+
+// Let's see what's going on here:
+// => pending: if the form is in a pending state, then it will be true, otherwise it will be false.
+// => data: an object implementing the FormData interface that contains the data the parent &lt;form&gt; is submitting.
+// => method: the HTTP method – GET, or POST. By default, it will be GET.
+// => action: a function reference.
+
+// here is a code example:
+
+function Submit() {
+  const status = useFormStatus();
+  return &lt;button disabled={status.pending}&gt;{status.pending ? 'Submitting...' : 'Submit'}&lt;/button&gt;;
+}
+
+// This hook is powerful and will be helpful when you want to know the status of a form submission (pending or not) and accordingly display the data.
+&lt;/script&gt;
+</code></pre>
+
+    <h3>10. useFormState() hook</h3>
+    <p>
+      useFormState() is another new hook in React19. It allows updating state
+      based on the result of a form submission.
+    </p>
+    <pre><code>&lt;script type="module"&gt;
+// Here's the syntax:
+
+// const [state, formAction] = useFormState(fn, initialState, permalink?);
+
+// => fn: the function to be called when the form is submitted or button is pressed.
+// => initialState: the value you want the state to be initially. It can be any serializable value. This argument is ignored after the action is first invoked.
+// => permalink: this is optional. A URL or page link, if fn is going to be run on the server then the page will redirect to permalink.
+
+// This hook will return:
+
+// => state: the initial state will be the value we have passed to initialState.
+// => formAction: an action that will be passed to the form action. The return value of this will be available in the state.
+
+// here is an example:
+import { useFormState } from 'react-dom';
+
+const FormState = () => {
+    const submitForm = (prevState, queryData) => {
+        const name =  queryData.get("username");
+        console.log(prevState); // previous form state
+        if(name === 'john'){
+            return {
+                success: true,
+                text: "Welcome"
+            }
+        }
+        else{
+            return {
+                success: false,
+                text: "Error"
+            }
+        }
+    }
+    const [ message, formAction ] = useFormState(submitForm, null)
+    return &lt;form action={formAction}&gt;
+        &lt;label&gt;Name&lt;/label&gt;
+        &lt;input type="text" name="username" /&gt;
+        &lt;button&gt;Submit&lt;/button&gt;
+        {message && &lt;h1&gt;{message.text}&lt;/h1&gt;}
+    &lt;/form&gt;
+}
+
+export default FormState;
+&lt;/script&gt;
+</code></pre>
+
+    <h3>11. useOptimistic() hook</h3>
+    <p>
+      useOptimistic() is a React Hook that enhances the user experience by
+      showing a different state while an async action is underway.
+    </p>
+    <pre><code>&lt;script type="module"&gt;
+// const [ optimisticMessage, addOptimisticMessage] = useOptimistic(state, updatefn)
+
+// For example, while a response is on the way, we can show a "state" to give the user an immediate response. Once the actual response is returned from the server, the "optimistic" state will be replaced by it.
+// The useOptimistic hook will immediately update the UI assuming the request will succeed. The name is "optimistic" because the user will see the optimistic (success) result of performing an action, even though the action actually takes time to complete.
+&lt;/script&gt;
+</code></pre>
+
+    <h3>Summary</h3>
+    <ul>
+      <li>
+        There will be a new React compiler that will be introduced in a future
+        version of React.
+      </li>
+      <li>
+        We'll now have auto re-rendering, memoization, and optimization of state
+        and UI.
+      </li>
+      <li>
+        There will be some new hooks like use() that will help simplify promises
+        and async code.
+      </li>
+      <li>There will now be server-side component support in React.</li>
+      <li>
+        We'll have better form handling using actions, useFormStatus(),
+        useStatusForm(), and useOptimistic().
+      </li>
+      <li>
+        React will optimize asset loading to enhance performance by using
+        suspense under the hood.
+      </li>
+      <li>We'll have web component integration in React.</li>
+    </ul>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
